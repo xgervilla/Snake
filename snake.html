@@ -63,11 +63,17 @@
 		const SNAKE_BORDER_COLOUR = 'darkgreen';
 		const FOOD_BORDER_COLOUR = 'darkred';
 		const FOOD_BACKGROUND_COLOUR = 'red';
+
 		//flechas del teclado;
 		const LEFT_KEY = 37;
 		const RIGHT_KEY = 39;
 		const UP_KEY = 38;
 		const DOWN_KEY = 40;
+		const P_KEY = 80;
+		const R_KEY = 82;
+
+		//boton de continuar/pausar
+		const resumeBtn = document.getElementById("resume");
 
 		//variables no constantes:
 		let snake = [ {x: 200, y: 200}, {x: 190, y: 200},
@@ -113,7 +119,9 @@
 			const goingRIGHT = (dx === 10);
 			const goingLEFT = (dx === -10);
 
-			if(keyPressed === 80) pause_snake();
+			if(keyPressed === P_KEY) pause_snake();
+			else if (keyPressed === R_KEY) refreshPage();
+
 			if(changingDirection || paused) return;
 			changingDirection = true;
 			if(keyPressed === LEFT_KEY && !goingRIGHT){
@@ -193,12 +201,13 @@
     		return (snake[0].x <= 0 || snake[0].x > gameCanvas.width-10 || snake[0].y< 0 || snake[0].y > gameCanvas.height-10);
     		/*(snake[0].x <= 0 && dx === -10)|| (snake[0].x >= gameCanvas.width-10 && dx === 10) || (snake[0].y < 0 && dy === -10) || (snake[0].y > gameCanvas.height-10 && dy === 10);*/
     	}
-
     	function refreshPage(){
     		window.location.reload();
     	}
     	function pause_snake(){
     		paused = !paused;
+    		if(resumeBtn.innerText === "PAUSE") resumeBtn.innerText = "CONTINUE";
+			else resumeBtn.innerText = "PAUSE";
     		main();
     	}
 
