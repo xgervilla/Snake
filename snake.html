@@ -1,0 +1,208 @@
+<!-- "intro" obligatoria -->
+<!DOCTYPE html>
+<!-- comienza el código en html-->
+<html>
+
+<head>
+	<!-- título de la página (lo que muestra el navegador) -->
+	<title>Snake Game</title>
+</head>
+
+<body>
+	<!-- pantalla sobre la que ver el juego-->
+	<div id = "score">0</div>
+	<canvas id="gameCanvas" width="400" height="400"></canvas>
+	<button id = "restart" type="submit"  onClick="refreshPage()">RESTART</button>
+	<button id = "resume" type="submit"  onClick="pause_snake()">PAUSE</button>
+
+
+	<style>
+		#gameCanvas{
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%,-50%);
+		}
+
+		#score {
+			text-align: center;
+			font-size: 120px;
+			font-family: 'Arial', serif;
+		}
+
+		#restart{
+			background-color: lightgrey;
+			color: black;
+			position: absolute;
+			top: 45%;
+			left: 13%;
+			padding: 15px 20px;
+			font-size: 40px;
+			border-radius: 10px;
+		}
+		#resume{
+			background-color: lightgrey;
+			color: black;
+			position: absolute;
+			top: 45%;
+			left: 75%;
+			padding: 15px 20px;
+			font-size: 40px;
+			border-radius: 10px;
+		}
+	</style>
+
+	<!-- parte con el javascript que servirá para modificar la vista y propiedades del juego -->
+	<script>
+		//a partir de aquí el código está en javascript
+		//variables del juego
+		//variables constantes:
+		const CANVAS_BORDER_COLOUR = 'black';
+		const CANVAS_BACKGROUND_COLOUR = 'white';
+		const SNAKE_BACKGROUND_COLOUR = 'lightgreen';
+		const SNAKE_BORDER_COLOUR = 'darkgreen';
+		const FOOD_BORDER_COLOUR = 'darkred';
+		const FOOD_BACKGROUND_COLOUR = 'red';
+		//flechas del teclado;
+		const LEFT_KEY = 37;
+		const RIGHT_KEY = 39;
+		const UP_KEY = 38;
+		const DOWN_KEY = 40;
+
+		//variables no constantes:
+		let snake = [ {x: 200, y: 200}, {x: 190, y: 200},
+		{x: 180, y: 200} ] //, {x: 170, y: 200}, {x: 160, y: 200} (descomentar para ampliar la serpiente inicial a 5 cubos)
+		//serpiente (3 cubos, centrados del 200 al 180 (hacia la izquierda), con cada cubo ocupando 10 pixeles)
+
+		let dx = 10; //desplazamiento horizontal
+		let dy = 0; //desplazamiento vertical
+		let foodX, foodY;
+		let score = 0;
+		let changingDirection = false;
+		let paused = false;
+
+		//cogemos el elemento que usamos de canvas y creamos el "drawing context" (?) sobre el que dibujar y modificar
+		var gameCanvas = document.getElementById("gameCanvas");
+		var draw_ctxt = gameCanvas.getContext("2d");
+
+		//Llamadas a funciones generales
+		main();
+		createFood();
+		document.addEventListener("keydown", changeDirection);
+
+		//funciones:
+		function main(){
+			if(endGame()) return;
+
+			if(!paused){
+				setTimeout(function onTick(){
+					changingDirection = false;
+					clearCanvas();
+					drawFood();
+					advanceSnake(); //ahora no se modifican dx ni dy así que se queda un solo bloque
+					drawSnake();
+
+					main();
+				}, 100)
+			}
+		}
+		function changeDirection(event){//cambiamos la dirección de la serpiente según las flechas del teclado
+			const keyPressed = event.keyCode; //guardamos en keyPressed la tecla actual
+			const goingUP = (dy === -10);
+			const goingDOWN = (dy === 10);
+			const goingRIGHT = (dx === 10);
+			const goingLEFT = (dx === -10);
+
+			if(keyPressed === 80) pause_snake();
+			if(changingDirection || paused) return;
+			changingDirection = true;
+			if(keyPressed === LEFT_KEY && !goingRIGHT){
+				dy = 0;
+				dx = -10;
+			}
+			else if(keyPressed === DOWN_KEY && !goingUP){
+				dx = 0;
+				dy = 10;
+			}
+			else if(keyPressed === UP_KEY && !goingDOWN){
+				dx = 0;
+				dy = -10;
+			}
+			else if(keyPressed === RIGHT_KEY && !goingLEFT){
+				dy = 0;
+				dx = 10;
+			}
+		}
+		function clearCanvas(){ //limpieza de la pantalla
+			//ponemos el color de fondo (fillStyle) y el del borde (strokestyle)
+			draw_ctxt.fillStyle = CANVAS_BACKGROUND_COLOUR;
+			draw_ctxt.strokestyle = CANVAS_BORDER_COLOUR;
+			//dibujamos un rectangulo que cubra el canvas y su borde (lo dejamos en blanco)
+			draw_ctxt.fillRect(0,0,gameCanvas.width, gameCanvas.height);
+			draw_ctxt.strokeRect(0,0,gameCanvas.width, gameCanvas.height);
+		}
+		function advanceSnake(){
+			const head = {x: snake[0].x+dx, y: snake[0].y+dy};
+			/*
+				creamos un bloque que supone el siguiente movimiento (donde estaría la cabeza en el siguiente turno) y añadimos la nueva cabeza al principio de la snake y eliminamos el último bloque (la cola), que desaparece al avanzar la serpiente
+				*/
+			snake.unshift(head);
+
+			//comprobamos si se ha comido la fruta (si lo ha hecho no hacemos el pop)
+			if(snake[0].x === foodX && snake[0].y === foodY){
+				score+=1;
+				document.getElementById('score').innerHTML = score;
+				createFood();
+			}
+			else snake.pop();
+		}
+		function drawSnake(){
+			//por cada cubo de la serpiente se llama a la función dibujar la parte
+			snake.forEach(drawSnakePart);
+		}		
+		function drawSnakePart(snakePart){
+			draw_ctxt.fillStyle = SNAKE_BACKGROUND_COLOUR;
+			draw_ctxt.strokestyle = SNAKE_BORDER_COLOUR;
+			draw_ctxt.fillRect(snakePart.x,snakePart.y,10,10);
+			draw_ctxt.strokeRect(snakePart.x,snakePart.y,10,10);
+		}
+		function drawFood(){
+			draw_ctxt.fillStyle = FOOD_BACKGROUND_COLOUR;
+			draw_ctxt.strokestyle = FOOD_BORDER_COLOUR;
+			draw_ctxt.fillRect(foodX,foodY,10,10);
+			draw_ctxt.strokeRect(foodX,foodY,10,10);
+		}
+		function createFood(){
+			foodX = randomCoord(0,gameCanvas.width-10);
+			foodY = randomCoord(0,gameCanvas.height-10);
+			snake.forEach(function isFoodOn(part){
+				const foodIsOnSnake = (part.x == foodX && part.y == foodY);
+				if(foodIsOnSnake) createFood();
+			});
+		}
+		function randomCoord(min, max){
+			//genera un numero random entre min y max
+      		return Math.round((Math.random() * (max-min) + min) / 10) * 10;
+    	}
+    	function endGame(){
+    		//para cada bloque de la serpiente hay que ver si choca consigo misma, pero podemos empezar desde el bloque 5 (4 empezando desde 0) porque habiendo menos nunca podrían chocar entre sí (ahorramos 3 comprobaciones)
+    		for(let i = 4; i<snake.length;++i){
+    			if(snake[i].x === snake[0].x && snake[i].y === snake[0].y) return true;
+    		}
+    		//si no choca consigo misma vemos si choca con los bordes del juego
+    		return (snake[0].x <= 0 || snake[0].x > gameCanvas.width-10 || snake[0].y< 0 || snake[0].y > gameCanvas.height-10);
+    		/*(snake[0].x <= 0 && dx === -10)|| (snake[0].x >= gameCanvas.width-10 && dx === 10) || (snake[0].y < 0 && dy === -10) || (snake[0].y > gameCanvas.height-10 && dy === 10);*/
+    	}
+
+    	function refreshPage(){
+    		window.location.reload();
+    	}
+    	function pause_snake(){
+    		paused = !paused;
+    		main();
+    	}
+
+	</script>
+</body>
+
+</html>
