@@ -1,0 +1,127 @@
+/*
+    html-component {}
+
+    #element-id {}
+
+    .className{}
+*/
+
+/*
+page background: edf3f4
+card background: d6e4ea
+card title: 8ea9c1
+card title text: 004172
+plot background: edf3f4
+filter-column text: 004172
+
+accent: 004172
+border: 8ea9c1
+text: 718ba5
+positive accent: 33ffe6
+negative accent: ff2c6d
+*/
+
+body {
+    background-color: #edf3f4;
+    color: #004172;
+}
+
+.filters_text {
+    color: #004172;
+}
+
+.filters_label {
+    margin-top: 30px;
+}
+
+.filters_first, .filters_treemap, .filters_rates  {
+    margin-top: 15px
+}
+
+.filters_title {
+    margin-top: 10px
+}
+
+.description_text {
+	font-size: "12px";
+	/*font-weight: "lighter";*/
+	color: "white";
+}
+
+.dropdown {
+    margin-top: 5px;
+	font-size: 14px;
+	color: black;
+}
+
+/* SELECT COLUMN */
+
+.select-column{
+    background-color: #8ea9c1;
+    border-radius: 1%;
+}
+
+/* DBC ROW */
+
+.row_parent {
+	margin-top: 45px;
+}
+
+/* SLIDERS */
+
+.rc-slider-dot-active {
+	border: solid 2px #004172;
+    background-color: lightblue;
+}
+
+.rc-slider-handle {
+  background-color: #004172;
+  border-color: #004172;
+}
+
+.rc-slider-mark-text {
+    color: rgb(101, 117, 133);
+}
+
+.rc-slider-mark-text-active {
+    color: #004172;
+}
+
+/* BUTTON */
+
+.button-color {
+    background-color: #d6e4ea;
+    border-color:#004172;
+    color: #004172;
+}
+
+.button-color:hover {
+    background-color: #004172;
+    color: #d6e4ea;
+    border-color: #d6e4ea;
+}
+
+.wordcloud {
+    text-align: center;
+    margin-top: 30px
+}
+
+.card-body {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.last_element {
+    margin-bottom: 100px
+}
+
+/* CARDS */
+
+.card-title, footer {
+    background-color: #8ea9c1;
+}
+
+.card-parent {
+    background-color: #d6e4ea;
+    border: 1.5px solid #004172;
+}
